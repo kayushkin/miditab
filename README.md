@@ -1,7 +1,8 @@
 # miditab
 
-Convert MIDI files into ASCII guitar tablature. Zero runtime dependencies, works
-in the browser and in Node.
+Convert MIDI files into ASCII tablature (guitar, bass, ukulele, mandolin,
+banjo) or MusicXML sheet notation. Zero runtime dependencies, works in the
+browser and in Node.
 
 ## Install
 
@@ -12,44 +13,78 @@ npm install miditab
 ## Usage
 
 ```ts
-import { midiToTab } from "miditab";
+import { midiToTab, midiToSheet, TUNINGS } from "miditab";
 
 const bytes = await file.arrayBuffer(); // or any Uint8Array
-const result = midiToTab(bytes);
-console.log(result.ascii);
+
+// ASCII tab (defaults to standard guitar tuning)
+const tab = midiToTab(bytes);
+console.log(tab.ascii);
+
+// ASCII tab for 4-string bass
+const bass = midiToTab(bytes, { tuning: TUNINGS["bass-4"] });
+
+// MusicXML sheet music — feed the string to any MusicXML renderer
+// (OpenSheetMusicDisplay, Verovio, MuseScore, …)
+const sheet = midiToSheet(bytes);
+console.log(sheet.musicXml);
 ```
 
-`midiToTab` accepts an options object:
+## Available tunings
 
-| option | default | description |
+| id | instrument | tuning |
 |---|---|---|
-| `trackIndex` | first non-drum track with notes | which MIDI track to convert |
-| `tuning` | `STANDARD` (EADGBE) | a `Tuning` object — see `src/tunings.ts` |
-| `maxFret` | `22` | upper fret bound for the assignment search |
-| `columns` | `80` | tab line wrap width in characters |
-| `beatsPerMeasure` | `4` | beats between bar lines |
-| `title` | `"<track name> — <tuning name>"` | title printed above the tab |
+| `guitar-standard` | guitar | EADGBE |
+| `guitar-drop-d` | guitar | DADGBE |
+| `guitar-dadgad` | guitar | DADGAD |
+| `bass-4` | bass | EADG |
+| `bass-5` | bass | BEADG |
+| `ukulele` | ukulele | GCEA |
+| `mandolin` | mandolin | GDAE |
+| `banjo-5` | banjo | gDGBD (open G) |
 
-The returned object also exposes the parsed `midi` file and the structured
-`placedChords` if you want to render your own visualization, plus an
-`unplaceableCount` for notes that fall outside the fretboard.
+Adding more is data-only — see `src/tunings.ts`. The fretboard assignment is
+agnostic to string count and tuning.
 
-## API surface
+## API
 
 ```ts
 parseMidi(bytes)                      // bytes → MidiFile
 groupChords(notes)                    // MidiNote[] → ChordIn[]
 assignFretboard(chords, { tuning })   // ChordIn[] → PlacedChord[]
 renderAscii(placed, { tuning, … })    // PlacedChord[] → string
+renderMusicXml(track, { … })          // MidiTrack → MusicXML string
+
 midiToTab(bytes, opts?)               // one-shot: bytes → { ascii, … }
+midiToSheet(bytes, opts?)             // one-shot: bytes → { musicXml, … }
 ```
 
-## Caveats (v0.1)
+`midiToTab` options:
 
-- Only ticks-per-quarter MIDI division is supported (SMPTE coded files yield a
-  best-effort render without bar lines).
-- Notes that lie outside the fretboard (too low or above `maxFret`) are
-  silently omitted; the count is returned in `unplaceableCount`.
+| option | default | description |
+|---|---|---|
+| `trackIndex` | first non-drum track with notes | which MIDI track to convert |
+| `tuning` | `GUITAR_STANDARD` | a `Tuning` from `TUNINGS` |
+| `maxFret` | `22` | upper fret bound for the assignment search |
+| `columns` | `80` | tab line wrap width in characters |
+| `beatsPerMeasure` | `4` | beats between bar lines |
+| `title` | `"<track> — <tuning>"` | title printed above the tab |
+
+`midiToSheet` options:
+
+| option | default | description |
+|---|---|---|
+| `trackIndex` | first non-drum track with notes | which MIDI track to convert |
+| `divisionUnit` | `16` | quantization grid: 4=quarter, 8=eighth, 16=sixteenth |
+| `beatsPerMeasure` | `4` | numerator of the time signature |
+| `beatUnit` | `4` | denominator of the time signature |
+| `clef` | auto from pitch range | `"treble"` or `"bass"` |
+| `title` | track name | work title in the score |
+| `partName` | track name | part name in the score |
+
+## Caveats
+
+- Only ticks-per-quarter MIDI division (SMPTE coded files yield best-effort output).
 - Drum tracks (channel 10 / index 9) are skipped by the default track picker.
-- No tempo / rhythm rendering — bar lines mark measures by tick count but note
-  durations are not drawn as quarter / eighth glyphs.
+- MusicXML output assumes 4/4 + C major; key/time signatures aren't inferred from MIDI.
+- Tab notes that lie outside the fretboard are silently omitted; count is in `unplaceableCount`.

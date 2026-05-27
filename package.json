@@ -1,7 +1,7 @@
 {
   "name": "miditab",
-  "version": "0.1.0",
-  "description": "Convert MIDI files to guitar tablature (ASCII).",
+  "version": "0.2.0",
+  "description": "Convert MIDI files to ASCII tablature (multi-instrument) or MusicXML sheet notation.",
   "license": "MIT",
   "author": "Slava Kayushkin",
   "type": "module",
