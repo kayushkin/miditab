@@ -20,7 +20,9 @@
     "README.md"
   ],
   "scripts": {
+    "//prepare": "dist/ is gitignored but IS this package's entry point, so a consumer that links us with file: (kayushkin.com) gets nothing unless we build on install. --ignore-scripts is required, not tidiness: a bare `npm ci` here would re-trigger this same prepare, forever.",
     "build": "tsc",
+    "prepare": "npm ci --ignore-scripts && npm run build",
     "test": "node --test test/*.test.mjs",
     "clean": "rm -rf dist"
   },
