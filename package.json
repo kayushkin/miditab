@@ -24,6 +24,8 @@
     "build": "tsc",
     "prepare": "npm ci --ignore-scripts && npm run build",
     "test": "node --test test/*.test.mjs",
+    "//check": "The assertion the nightly repo-node-guard runs. The tests import ../dist/index.js, so they need a build first; the guard runs install -> build -> artifact -> check in that order, and `prepare` builds on install too, so dist/ is always there by the time this runs.",
+    "check": "npm run test",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
