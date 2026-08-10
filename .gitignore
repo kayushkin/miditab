@@ -1,5 +1,13 @@
 node_modules/
+# A trailing slash matches directories only. Sweeping this repo in a git
+# worktree wants node_modules symlinked to the main checkout's copy, and that
+# symlink is NOT a directory -- it shows up untracked and `git add -A` commits
+# it. Both spellings, so the worktree case is covered too.
+node_modules
 dist/
+
+# Written by scripts/sabotage.py on every scored run.
+mutation-results.json
 *.log
 .DS_Store
 .local/

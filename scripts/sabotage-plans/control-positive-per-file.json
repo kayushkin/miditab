@@ -1,0 +1,123 @@
+[
+  {
+    "id": "CONTROL-POSITIVE",
+    "kind": "control",
+    "describes": "parseMidi reports zero tracks — the suite must go red, or it never ran",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "  return { format, ticksPerQuarter, tempoBPM, tracks };",
+        "new": "  return { format, ticksPerQuarter, tempoBPM, tracks: [] };"
+      }
+    ]
+  },
+  {
+    "id": "CONTROL-NEGATIVE",
+    "kind": "control",
+    "describes": "a comment is reworded — the suite must stay green, or it is red for an unrelated reason",
+    "edits": [
+      {
+        "file": "src/index.ts",
+        "old": "// Public entry point: take MIDI bytes, return ASCII tab and/or MusicXML.",
+        "new": "// Public entry point. (CONTROL-NEGATIVE: this edit changes no behaviour.)"
+      }
+    ]
+  },
+
+  {
+    "id": "M1-renderAscii-gutted",
+    "kind": "control-positive-per-file",
+    "describes": "renderAscii returns the empty string — is src/renderAscii.ts tested at all?",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "  return out.join(\"\\n\") + \"\\n\";",
+        "new": "  return \"\";"
+      }
+    ]
+  },
+  {
+    "id": "M2-renderMusicXml-gutted",
+    "kind": "control-positive-per-file",
+    "describes": "renderMusicXml returns the empty string — is src/renderMusicXml.ts tested at all?",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "  return lines.join(\"\\n\") + \"\\n\";",
+        "new": "  return \"\";"
+      }
+    ]
+  },
+  {
+    "id": "M3-assignFretboard-gutted",
+    "kind": "control-positive-per-file",
+    "describes": "assignFretboard places nothing — is src/assignFretboard.ts tested at all?",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "  for (const c of chordsIn) {\n    const cand = placeChord(c.pitches, opts.tuning, maxFret, prevCenter);",
+        "new": "  for (const c of chordsIn.slice(0, 0)) {\n    const cand = placeChord(c.pitches, opts.tuning, maxFret, prevCenter);"
+      }
+    ]
+  },
+  {
+    "id": "M4-groupChords-gutted",
+    "kind": "control-positive-per-file",
+    "describes": "groupChords collapses every note into one chord — is the onset grouping pinned?",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "  tolerance = 10,",
+        "new": "  tolerance = 1_000_000,"
+      }
+    ]
+  },
+  {
+    "id": "M5-pickDefaultTrack-gutted",
+    "kind": "control-positive-per-file",
+    "describes": "pickDefaultTrack always answers 0, ignoring drum channel and empty tracks — is src/index.ts's track choice pinned?",
+    "edits": [
+      {
+        "file": "src/index.ts",
+        "old": "  // Prefer the first track with notes that isn't on the drum channel (9).\n  for (let i = 0; i < midi.tracks.length; i++) {",
+        "new": "  return 0;\n  // Prefer the first track with notes that isn't on the drum channel (9).\n  for (let i = 0; i < midi.tracks.length; i++) {"
+      }
+    ]
+  },
+  {
+    "id": "M6-tuning-option-ignored",
+    "kind": "control-positive-per-file",
+    "describes": "midiToTab ignores opts.tuning and always uses guitar standard — is src/index.ts's option plumbing pinned?",
+    "edits": [
+      {
+        "file": "src/index.ts",
+        "old": "  const tuning = opts.tuning ?? GUITAR_STANDARD;",
+        "new": "  const tuning = GUITAR_STANDARD;"
+      }
+    ]
+  },
+  {
+    "id": "M7-guitar-standard-corrupted",
+    "kind": "control-positive-per-file",
+    "describes": "GUITAR_STANDARD's open pitches are wrong — is the tuning data in src/tunings.ts pinned?",
+    "edits": [
+      {
+        "file": "src/tunings.ts",
+        "old": "  openPitches: [64, 59, 55, 50, 45, 40], // e B G D A E",
+        "new": "  openPitches: [64, 59, 55, 50, 45, 41], // e B G D A E (low string a semitone sharp)"
+      }
+    ]
+  },
+  {
+    "id": "M8-drop-d-corrupted",
+    "kind": "control-positive-per-file",
+    "describes": "GUITAR_DROP_D's open pitches are wrong — one of the five tunings no test names",
+    "edits": [
+      {
+        "file": "src/tunings.ts",
+        "old": "  openPitches: [64, 59, 55, 50, 45, 38], // e B G D A D",
+        "new": "  openPitches: [64, 59, 55, 50, 45, 40], // e B G D A D (not dropped at all)"
+      }
+    ]
+  }
+]
