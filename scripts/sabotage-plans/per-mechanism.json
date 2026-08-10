@@ -1,0 +1,587 @@
+[
+  {
+    "id": "CONTROL-POSITIVE",
+    "kind": "control",
+    "describes": "parseMidi reports zero tracks \u2014 the suite must go red, or it never ran",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "  return { format, ticksPerQuarter, tempoBPM, tracks };",
+        "new": "  return { format, ticksPerQuarter, tempoBPM, tracks: [] };"
+      }
+    ]
+  },
+  {
+    "id": "CONTROL-NEGATIVE",
+    "kind": "control",
+    "describes": "a comment is reworded \u2014 the suite must stay green, or it is red for an unrelated reason",
+    "edits": [
+      {
+        "file": "src/index.ts",
+        "old": "// Public entry point: take MIDI bytes, return ASCII tab and/or MusicXML.",
+        "new": "// Public entry point. (CONTROL-NEGATIVE: this edit changes no behaviour.)"
+      }
+    ]
+  },
+  {
+    "id": "RA1-no-wrapping",
+    "kind": "per-mechanism",
+    "mechanism": "renderAscii/wrapping",
+    "describes": "lines never wrap, whatever `columns` says",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "  const innerBudget = columns - labelWidth - reservedTrailingBar;",
+        "new": "  const innerBudget = Number.MAX_SAFE_INTEGER;"
+      }
+    ]
+  },
+  {
+    "id": "RA2-no-measure-bars",
+    "kind": "per-mechanism",
+    "mechanism": "renderAscii/bar-lines",
+    "describes": "no bar line is ever inserted at a measure boundary",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "  let nextBarTick = ticksPerMeasure;",
+        "new": "  let nextBarTick = Number.MAX_SAFE_INTEGER;"
+      }
+    ]
+  },
+  {
+    "id": "RA3-no-multidigit-padding",
+    "kind": "per-mechanism",
+    "mechanism": "renderAscii/column-width",
+    "describes": "every column is one char wide, so a two-digit fret pushes its row out of alignment",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "    let w = 1;\n    for (const s of cell.perString) if (s.length > w) w = s.length;\n    return w;",
+        "new": "    return 1;"
+      }
+    ]
+  },
+  {
+    "id": "RA4-separator-ignored",
+    "kind": "per-mechanism",
+    "mechanism": "renderAscii/separator-option",
+    "describes": "opts.separator is ignored and the separator is always '-'",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "  const sep = opts.separator ?? \"-\";",
+        "new": "  const sep = \"-\";"
+      }
+    ]
+  },
+  {
+    "id": "RA5-title-dropped",
+    "kind": "per-mechanism",
+    "mechanism": "renderAscii/title-block",
+    "describes": "the title line is emitted blank",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "    out.push(opts.title);",
+        "new": "    out.push(\"\");"
+      }
+    ]
+  },
+  {
+    "id": "RA6-beats-per-measure-ignored",
+    "kind": "per-mechanism",
+    "mechanism": "renderAscii/beatsPerMeasure-option",
+    "describes": "opts.beatsPerMeasure is ignored and every measure is 4 beats",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "  const beatsPerMeasure = opts.beatsPerMeasure ?? 4;",
+        "new": "  const beatsPerMeasure = 4;"
+      }
+    ]
+  },
+  {
+    "id": "RA7-smpte-tick-fallback-gone",
+    "kind": "per-mechanism",
+    "mechanism": "renderAscii/zero-ppq-fallback",
+    "describes": "a SMPTE file (ticksPerQuarter 0) no longer falls back to 480 ticks per beat",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "  const ticksPerBeat = opts.ticksPerQuarter > 0 ? opts.ticksPerQuarter : 480;",
+        "new": "  const ticksPerBeat = opts.ticksPerQuarter;"
+      }
+    ]
+  },
+  {
+    "id": "RA8-labels-reversed",
+    "kind": "per-mechanism",
+    "mechanism": "renderAscii/string-label-order",
+    "describes": "string labels are printed bottom-up against top-down rows",
+    "edits": [
+      {
+        "file": "src/renderAscii.ts",
+        "old": "      out.push(`${tuning.labels[s]}|${group[s]}`);",
+        "new": "      out.push(`${tuning.labels[nStrings - 1 - s]}|${group[s]}`);"
+      }
+    ]
+  },
+  {
+    "id": "AF1-no-span-penalty",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/span-penalty",
+    "describes": "a chord stretched across the neck costs the same as a compact one",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "  score += span * span * 1.5;",
+        "new": "  score += 0;"
+      }
+    ]
+  },
+  {
+    "id": "AF2-no-hand-movement-penalty",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/hand-centre-movement",
+    "describes": "moving the hand up the neck between chords is free",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "    score += Math.abs(center - prevCenter) * 2;",
+        "new": "    score += 0;"
+      }
+    ]
+  },
+  {
+    "id": "AF3-no-high-fret-tiebreak",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/high-fret-tiebreak",
+    "describes": "a high position ties with the equivalent low one instead of losing to it",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "    if (p) score += p.fret * 0.1;",
+        "new": "    if (p) score += 0;"
+      }
+    ]
+  },
+  {
+    "id": "AF4-maxFret-option-ignored",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/maxFret-option",
+    "describes": "opts.maxFret is ignored and the limit is always 22",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "  const maxFret = opts.maxFret ?? 22;",
+        "new": "  const maxFret = 22;"
+      }
+    ]
+  },
+  {
+    "id": "AF5-maxFret-not-enforced",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/maxFret-bound",
+    "describes": "the fret ceiling is not enforced, so a note can be placed past the end of the neck",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "      if (fret >= 0 && fret <= maxFret) {",
+        "new": "      if (fret >= 0) {"
+      }
+    ]
+  },
+  {
+    "id": "AF6-unplaced-not-penalised",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/unplaced-penalty",
+    "describes": "leaving a note unplaced costs nothing, so the search stops preferring to place notes",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "    if (!p) score += 1000;",
+        "new": "    if (!p) score += 0;"
+      }
+    ],
+    "expected_unnoticed": "the penalty is a constant offset within a chord and cannot change the argmin. A pick is only ever left undefined by the `opts.length === 0` branch, so the set of unplaced indices is fixed by the pitches and the tuning before the search starts, and is identical in every candidate scoreChord sees. A candidate that fails on string collision never reaches scoreChord at all. This declaration becomes false the moment recurse() grows a real skip-this-pitch branch \u2014 the comment at the foot of recurse() contemplates exactly that, and the scorer will report STALE-DECLARATION on the next run if it is added. Not left as an argument: removing the term and diffing assignFretboard's output over 776 inputs (666 two-note chords spanning the guitar range, 110 two-chord sequences) changed nothing at all."
+  },
+  {
+    "id": "AF7-unplaced-not-reported",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/unplaced-reporting",
+    "describes": "a pitch that cannot be played is silently dropped instead of reported in `unplaced`",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "      if (p) positions.push(p); else unplaced.push(c.pitches[i]);",
+        "new": "      if (p) positions.push(p);"
+      }
+    ]
+  },
+  {
+    "id": "AF8-positions-unsorted",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/position-order",
+    "describes": "positions come back ordered by lowest string first, reversing the tab rows",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "    positions.sort((a, b) => a.string - b.string);",
+        "new": "    positions.sort((a, b) => b.string - a.string);"
+      }
+    ]
+  },
+  {
+    "id": "AF9-grouping-tolerance-ignored",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/onset-tolerance",
+    "describes": "the tolerance argument is ignored and only exactly-equal onsets group",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "    if (n.startTick - cur.startTick <= tolerance) {",
+        "new": "    if (n.startTick - cur.startTick <= 0) {"
+      }
+    ]
+  },
+  {
+    "id": "AF10-chord-duration-not-longest",
+    "kind": "per-mechanism",
+    "mechanism": "assignFretboard/chord-duration",
+    "describes": "a chord takes the duration of its first note rather than its longest",
+    "edits": [
+      {
+        "file": "src/assignFretboard.ts",
+        "old": "      cur.durationTicks = Math.max(cur.durationTicks, n.durationTicks);",
+        "new": "      cur.durationTicks = cur.durationTicks;"
+      }
+    ]
+  },
+  {
+    "id": "PM1-running-status-broken",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/running-status",
+    "describes": "a running-status data byte is eaten as a status byte instead of being pushed back",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "        r.pos--;\n        status = runningStatus;",
+        "new": "        status = runningStatus;"
+      }
+    ]
+  },
+  {
+    "id": "PM2-sysex-payload-not-skipped",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/sysex-skipping",
+    "describes": "a sysex payload is left in the stream to be misread as events",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "        const len = r.varlen();\n        r.bytes(len);",
+        "new": "        const len = r.varlen();"
+      }
+    ]
+  },
+  {
+    "id": "PM3-tempo-ignored",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/tempo-meta-event",
+    "describes": "the 0x51 set-tempo event is read and thrown away, so tempoBPM stays 120",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "          if (us > 0) tempoBPM = 60_000_000 / us;",
+        "new": "          if (us > 0) tempoBPM = 120;"
+      }
+    ]
+  },
+  {
+    "id": "PM4-two-byte-events-misread",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/two-data-byte-events",
+    "describes": "aftertouch / controller / pitch-bend consume one data byte instead of two",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "        r.u8(); r.u8();",
+        "new": "        r.u8();"
+      }
+    ]
+  },
+  {
+    "id": "PM5-one-byte-events-misread",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/one-data-byte-events",
+    "describes": "program change / channel pressure consume two data bytes instead of one",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "        // Program change / Channel pressure \u2014 1 data byte\n        r.u8();",
+        "new": "        // Program change / Channel pressure \u2014 1 data byte\n        r.u8(); r.u8();"
+      }
+    ]
+  },
+  {
+    "id": "PM6-smpte-treated-as-ppq",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/smpte-division",
+    "describes": "an SMPTE division is reported as a tick count instead of 0",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "    // SMPTE division: not supported for tempo math; leave 0.\n    ticksPerQuarter = 0;",
+        "new": "    // SMPTE division: not supported for tempo math; leave 0.\n    ticksPerQuarter = division & 0x7fff;"
+      }
+    ]
+  },
+  {
+    "id": "PM7-hanging-notes-dropped",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/notes-active-at-end-of-track",
+    "describes": "a note with no note-off is dropped instead of closed at the end of the track",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "    // Close any still-active notes at end of track.\n    for (const [key, n] of active) {",
+        "new": "    // Close any still-active notes at end of track.\n    active.clear();\n    for (const [key, n] of active) {"
+      }
+    ]
+  },
+  {
+    "id": "PM8-retrigger-loses-first-note",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/retriggered-pitch",
+    "describes": "re-sounding a pitch that is already ringing discards the first note",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "          const prev = active.get(key);\n          if (prev) {\n            track.notes.push({\n              pitch,\n              startTick: prev.startTick,\n              durationTicks: Math.max(0, absTick - prev.startTick),\n              velocity: prev.velocity,\n              channel,\n            });\n          }\n          active.set(key, { startTick: absTick, velocity, channel });",
+        "new": "          active.set(key, { startTick: absTick, velocity, channel });"
+      }
+    ]
+  },
+  {
+    "id": "PM9-note-order-by-pitch-reversed",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/note-ordering",
+    "describes": "simultaneous notes come back highest pitch first instead of lowest",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "    track.notes.sort((a, b) => a.startTick - b.startTick || a.pitch - b.pitch);",
+        "new": "    track.notes.sort((a, b) => a.startTick - b.startTick || b.pitch - a.pitch);"
+      }
+    ]
+  },
+  {
+    "id": "PM10-track-channel-is-last-not-first",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/track-channel",
+    "describes": "track.channel reports the last channel seen rather than the first",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "        if (track.channel === null) track.channel = channel;",
+        "new": "        track.channel = channel;"
+      }
+    ]
+  },
+  {
+    "id": "PM11-zero-velocity-note-on-starts-a-note",
+    "kind": "per-mechanism",
+    "mechanism": "parseMidi/zero-velocity-note-on",
+    "describes": "a note-on with velocity 0 starts a note instead of ending one",
+    "edits": [
+      {
+        "file": "src/parseMidi.ts",
+        "old": "        const isNoteOn = high === 0x90 && velocity > 0;",
+        "new": "        const isNoteOn = high === 0x90;"
+      }
+    ]
+  },
+  {
+    "id": "MX1-no-dotted-notes",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/dotted-decomposition",
+    "describes": "a dotted duration is emitted as two glyphs instead of one dotted glyph",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "      if (g.q % 2 === 0 && remaining >= (g.q * 3) / 2) {",
+        "new": "      if (g.q % 2 === 1 && remaining >= (g.q * 3) / 2) {"
+      }
+    ]
+  },
+  {
+    "id": "MX2-remainder-not-dropped",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/drop-the-remainder",
+    "describes": "a sub-sixteenth remainder is emitted as a spurious 16th instead of dropped",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "      // Less than a sixteenth left \u2014 drop it (already quantized).\n      break;",
+        "new": "      out.push({ type: \"16th\", dots: 0, divisions: gridUnit });\n      break;"
+      }
+    ],
+    "expected_unnoticed": "the `!placed` branch is unreachable for every input the renderer can produce. `units` reaches glyphsForUnits as an integer \u2014 quantize() is Math.round, gap and measure-remainder arithmetic is integer, and chord length is Math.max(1, ...) \u2014 and the glyph table bottoms out at q=1 with every dotted subtraction (24, 12, 6, 3) also an integer, so a non-zero remainder always places a 16th. Reachable only via a fractional `units`, which needs a caller outside this module. Not left as an argument: replacing the branch with a throw leaves all 79 tests green, so nothing the suite renders reaches it."
+  },
+  {
+    "id": "MX3-accidentals-dropped",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/midiToPitch-alter",
+    "describes": "a sharp is emitted with no <alter>, so F# reads as F",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "            if (info.alter) lines.push(`          <alter>${info.alter}</alter>`);",
+        "new": "            if (false) lines.push(`          <alter>${info.alter}</alter>`);"
+      }
+    ]
+  },
+  {
+    "id": "MX4-octave-off-by-one",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/midiToPitch-octave",
+    "describes": "every note is written an octave high",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "  const octave = Math.floor(p / 12) - 1;",
+        "new": "  const octave = Math.floor(p / 12);"
+      }
+    ]
+  },
+  {
+    "id": "MX5-pitch-name-table-corrupt",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/pitch-name-table",
+    "describes": "the pitch-class name table names B as H",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "const PITCH_NAMES = [\"C\", \"C\", \"D\", \"D\", \"E\", \"F\", \"F\", \"G\", \"G\", \"A\", \"A\", \"B\"];",
+        "new": "const PITCH_NAMES = [\"C\", \"C\", \"D\", \"D\", \"E\", \"F\", \"F\", \"G\", \"G\", \"A\", \"A\", \"H\"];"
+      }
+    ]
+  },
+  {
+    "id": "MX6-xml-not-escaped",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/escXml",
+    "describes": "a title containing & or < is written into the document unescaped",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "    \"&\": \"&amp;\", \"<\": \"&lt;\", \">\": \"&gt;\", '\"': \"&quot;\", \"'\": \"&apos;\",",
+        "new": "    \"&\": \"&\", \"<\": \"<\", \">\": \">\", '\"': '\"', \"'\": \"'\","
+      }
+    ]
+  },
+  {
+    "id": "MX7-gaps-not-filled-with-rests",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/rest-filling",
+    "describes": "a silent gap emits no rest, so later notes slide earlier in the bar",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "    if (s > cursor) {",
+        "new": "    if (false && s > cursor) {"
+      }
+    ]
+  },
+  {
+    "id": "MX8-no-measure-splitting",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/measure-splitting",
+    "describes": "a measure holds four bars' worth of music, so nothing is ever split at a bar line",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "  const measureCapacity = divsPerMeasure / gridUnit; // grid units per measure",
+        "new": "  const measureCapacity = (divsPerMeasure * 4) / gridUnit; // grid units per measure"
+      }
+    ]
+  },
+  {
+    "id": "MX9-clef-always-treble",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/auto-clef",
+    "describes": "the automatic clef choice always answers treble",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "  const clef = opts.clef ?? (meanPitch < 57 ? \"bass\" : \"treble\");",
+        "new": "  const clef = opts.clef ?? \"treble\";"
+      }
+    ]
+  },
+  {
+    "id": "MX10-divisions-wrong",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/divisions-attribute",
+    "describes": "the <divisions> attribute says 1 while durations are counted in sixteenths",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "      lines.push(`        <divisions>${divsPerQuarter}</divisions>`);",
+        "new": "      lines.push(`        <divisions>1</divisions>`);"
+      }
+    ]
+  },
+  {
+    "id": "MX11-chord-marker-missing",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/chord-marker",
+    "describes": "the second note of a chord loses its <chord/>, so it reads as a separate beat",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "            if (pi > 0) lines.push('        <chord/>');",
+        "new": "            if (pi > 1) lines.push('        <chord/>');"
+      }
+    ]
+  },
+  {
+    "id": "MX12-final-measure-not-padded",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/final-measure-padding",
+    "describes": "a short final measure is left short instead of padded with a rest",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "  if (measureUnits > 0 && measureUnits < measureCapacity) {",
+        "new": "  if (false && measureUnits > 0 && measureUnits < measureCapacity) {"
+      }
+    ]
+  },
+  {
+    "id": "MX13-zero-length-notes-kept",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/zero-duration-notes",
+    "describes": "a zero-length note is laid out instead of skipped",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "    if (n.durationTicks <= 0) continue;",
+        "new": "    if (n.durationTicks < 0) continue;"
+      }
+    ]
+  },
+  {
+    "id": "MX14-time-signature-hardcoded",
+    "kind": "per-mechanism",
+    "mechanism": "renderMusicXml/time-signature",
+    "describes": "the time signature is always 4/4 whatever the caller asked for",
+    "edits": [
+      {
+        "file": "src/renderMusicXml.ts",
+        "old": "      lines.push(`        <time><beats>${beatsPerMeasure}</beats><beat-type>${beatUnit}</beat-type></time>`);",
+        "new": "      lines.push(`        <time><beats>4</beats><beat-type>4</beat-type></time>`);"
+      }
+    ]
+  }
+]
