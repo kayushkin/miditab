@@ -265,11 +265,11 @@ export function renderMusicXml(track: MidiTrack, opts: MusicXmlOptions): string 
       } else {
         // Chord: first pitch as the head note, the rest with <chord/>.
         const glyphs = glyphsForUnits(ev.units, divsPerQuarter, gridUnit);
-        // For chord notes we emit the *entire* glyph sequence on the first
-        // pitch, but only one glyph (the longest) on chord-tied pitches —
-        // this is a simplification that loses chord behavior across ties.
-        // To keep it readable, we render the full glyph sequence per pitch
-        // but mark all-but-first as <chord/>.
+        // A full cross product: the outer loop walks every glyph, the inner
+        // loop every pitch, so each pitch gets the entire glyph sequence and
+        // every pitch after the first is marked <chord/>. Glyph is the outer
+        // axis, so the chord is emitted once per glyph: a duration split into
+        // several glyphs produces several complete chords, one per glyph.
         for (let gi = 0; gi < glyphs.length; gi++) {
           const g = glyphs[gi];
           for (let pi = 0; pi < ev.pitches.length; pi++) {
