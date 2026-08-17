@@ -66,7 +66,23 @@ function glyphsForUnits(units: number, divisionsPerQuarter: number, gridUnit: nu
       }
     }
     if (!placed) {
-      // Less than a sixteenth left — drop it (already quantized).
+      // Less than a sixteenth left — drop it. The table bottoms out at q=1, so
+      // this is reached only by a fractional `remaining`.
+      //
+      // That is reachable through the public API, so this is live code, not a
+      // guard against something that cannot happen. Timeline `units` are whole
+      // numbers (quantize is Math.round and the gap and chord-length arithmetic
+      // is integer), but pushEvent slices events at bar lines using
+      //     measureCapacity = divisionUnit * beatsPerMeasure / beatUnit
+      // and the declared option types allow that to be fractional. Measured:
+      // { divisionUnit: 4, beatUnit: 8, beatsPerMeasure: 3 } gives a capacity of
+      // 1.5, and the 0.5 left over at each bar line arrives here and is dropped.
+      //
+      // Severity, so nobody re-derives it: that combination asks for a 3/8 bar
+      // on a quarter-note grid, which cannot be written down whatever this
+      // branch does, so no sensible caller is losing music to it today. What is
+      // wrong is silence — the remainder goes without a word, and renderMusicXml
+      // has no other place to say the grid cannot hold the requested measure.
       break;
     }
   }

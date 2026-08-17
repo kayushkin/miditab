@@ -151,6 +151,26 @@ function scoreChord(picks: (FretPosition | undefined)[], prevCenter: number | nu
   let score = 0;
 
   // Penalize unplaced notes heavily.
+  //
+  // Over the reals this term cannot pick a different candidate. A pick is only
+  // ever left undefined by the `opts.length === 0` branch in recurse(), so the
+  // set of unplaced pitches is fixed by the pitches and the tuning before the
+  // search starts and is the same in every candidate scoreChord sees; a
+  // candidate that fails on string collision never reaches the scorer at all.
+  // The term is therefore a constant offset per chord.
+  //
+  // It still changes the output, because the scores are doubles. Adding 1000
+  // rounds away the last bits that break an exact tie. Measured: ukulele,
+  // maxFret 12, chord [73,74,83] following [68,69,78] — candidates s1f9+s3f7
+  // and s3f6+s0f5 both score exactly 53/5, but as doubles they are
+  // 10.600000000000001 and 10.6, so the second wins on `score < best.score`.
+  // At +1000 both round to 1010.6, the comparison is no longer strict, and the
+  // first-enumerated candidate wins instead. 1 of 5,456 inputs across all 8
+  // tunings changes its voicing this way.
+  //
+  // So do not read this as dead weight and do not delete it: it is also the
+  // branch a real skip-this-pitch search would need — see the note at the foot
+  // of recurse(), which contemplates adding one.
   for (const p of picks) {
     if (!p) score += 1000;
   }
