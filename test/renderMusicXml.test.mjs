@@ -1,7 +1,7 @@
 // The MusicXML renderer, one mechanism at a time.
 //
 // This is the widest gap the per-mechanism plan found: `M2-renderMusicXml-gutted`
-// is CAUGHT, and thirteen of the fourteen named behaviours in the file were
+// is CAUGHT, and thirteen of the fourteen named behaviors in the file were
 // unpinned — twelve scored UNNOTICED, and the thirteenth (MX8) only escaped that
 // verdict because its first spelling did not compile; rewritten so it does, the
 // pre-existing 29-test suite passes it too.

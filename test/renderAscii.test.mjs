@@ -3,7 +3,7 @@
 // `M1-renderAscii-gutted` already proved the suite notices when the whole
 // renderer returns "". It noticed because the round-trip tests compare a whole
 // tab against a literal, and a whole-file gut changes every one of them. That
-// same shape is why the per-mechanism plan found six of eight behaviours here
+// same shape is why the per-mechanism plan found six of eight behaviors here
 // UNNOTICED: the round-trip fixtures are all one measure of single-digit frets
 // in a default-width, untitled, default-separator render, so wrapping, bar
 // placement, and all three options are never varied and cannot be observed.

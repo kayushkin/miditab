@@ -56,7 +56,7 @@ PLAN = [
         "edits": [{
             "file": "src/index.ts",
             "old": "// Public entry point: take MIDI bytes, return ASCII tab and/or MusicXML.",
-            "new": "// Public entry point. (CONTROL-NEGATIVE: this edit changes no behaviour.)",
+            "new": "// Public entry point. (CONTROL-NEGATIVE: this edit changes no behavior.)",
         }],
     },
 
@@ -127,7 +127,7 @@ PLAN = [
         "  score += 0;",
     ),
     mutation(
-        "AF2-no-hand-movement-penalty", "assignFretboard/hand-centre-movement",
+        "AF2-no-hand-movement-penalty", "assignFretboard/hand-center-movement",
         "moving the hand up the neck between chords is free",
         FRET,
         "    score += Math.abs(center - prevCenter) * 2;",

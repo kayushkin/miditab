@@ -4,7 +4,7 @@
 // per-FILE question — replace a whole mechanism with its failure value and see
 // whether the suite notices. src/parseMidi.ts passed that: gutting it reddens
 // the suite, so the file is reachable. Reachable is not pinned. The per-mechanism
-// plan then aimed one mutation at each named behaviour in the file and **eleven
+// plan then aimed one mutation at each named behavior in the file and **eleven
 // of eleven went UNNOTICED**, because every test fed it a byte stream built from
 // a note list, and a note list can only express the parser's happy path.
 //
@@ -92,7 +92,7 @@ test("two-data-byte events are consumed whole: aftertouch, controller, pitch ben
   const track = onlyTrack([
     { delta: 0, bytes: [0xa0, 60, 64] },   // polyphonic aftertouch
     { delta: 0, bytes: [0xb0, 7, 100] },   // controller: channel volume
-    { delta: 0, bytes: [0xe0, 0, 64] },    // pitch bend: centre
+    { delta: 0, bytes: [0xe0, 0, 64] },    // pitch bend: center
     { delta: 0, bytes: noteOn(60) },
     { delta: 96, bytes: noteOff(60) },
   ]);

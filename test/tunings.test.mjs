@@ -78,7 +78,7 @@ test("STANDARD is still an alias for GUITAR_STANDARD", () => {
 // This one pins the ASSIGNER against each tuning, not the pitch values — see
 // the warning at the top of this file. It is worth having anyway: it is the
 // check that every shipped tuning can actually be rendered.
-test("every tuning renders one tab line per string, labelled in order", () => {
+test("every tuning renders one tab line per string, labeled in order", () => {
   let checked = 0;
   for (const tuning of TUNING_LIST) {
     const file = buildMidi([melodyTrack(tuning.openPitches, { name: tuning.id })]);

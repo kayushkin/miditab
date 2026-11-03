@@ -19,7 +19,7 @@
       {
         "file": "src/index.ts",
         "old": "// Public entry point: take MIDI bytes, return ASCII tab and/or MusicXML.",
-        "new": "// Public entry point. (CONTROL-NEGATIVE: this edit changes no behaviour.)"
+        "new": "// Public entry point. (CONTROL-NEGATIVE: this edit changes no behavior.)"
       }
     ]
   },

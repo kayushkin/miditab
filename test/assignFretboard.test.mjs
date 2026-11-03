@@ -3,7 +3,7 @@
 //
 // `M3-assignFretboard-gutted` and `M4-groupChords-gutted` both reddened the
 // suite, so the file is reachable. The per-mechanism plan then found nine of
-// ten behaviours here UNNOTICED. The reason is visible in the round-trip
+// ten behaviors here UNNOTICED. The reason is visible in the round-trip
 // fixtures: every one of them is notes that fall on open strings or the first
 // few frets, where every candidate placement scores the same and the scorer is
 // never asked a question it could answer differently.
@@ -106,7 +106,7 @@ test("notes further apart than the tolerance stay separate", () => {
   assert.equal(grouped.length, 2);
 });
 
-test("the tolerance argument is honoured when the caller widens it", () => {
+test("the tolerance argument is honored when the caller widens it", () => {
   const grouped = groupChords([
     { pitch: 60, startTick: 0, durationTicks: 96 },
     { pitch: 64, startTick: 50, durationTicks: 96 },
